@@ -42,6 +42,10 @@ func (c *Async) Get(key string) (resp []byte, ok bool) {
 		t0 = time.Now()
 	}
 
+	if c.Log != nil {
+		c.Log.Printf("get %q", key)
+	}
+
 	resp, ok = c.Underlying.Get(key)
 
 	if ok {
@@ -64,6 +68,10 @@ func (c *Async) Set(key string, data []byte) {
 		t0 = time.Now()
 	}
 
+	if c.Log != nil {
+		c.Log.Printf("set %q [data: %d bytes]", key, len(data))
+	}
+
 	c.Underlying.Set(key, data)
 
 	if c.Time != nil {
@@ -78,6 +86,10 @@ func (c *Async) Delete(key string) {
 	var t0 time.Time
 	if c.Time != nil {
 		t0 = time.Now()
+	}
+
+	if c.Log != nil {
+		c.Log.Printf("delete %q", key)
 	}
 
 	c.Underlying.Delete(key)
