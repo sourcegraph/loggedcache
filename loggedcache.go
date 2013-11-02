@@ -50,10 +50,21 @@ func (c *Async) Get(key string) (resp []byte, ok bool) {
 
 	if ok {
 		go c.Hit()
+		if c.Log != nil {
+			go c.Log.Printf("get hit %q", key)
+		}
+	} else {
+		if c.Log != nil {
+			go c.Log.Printf("get miss %q", key)
+		}
 	}
 
 	if c.Time != nil {
-		go c.Time("get", time.Since(t0))
+		dt := time.Since(t0)
+		go c.Time("get", dt)
+		if c.Log != nil {
+			go c.Log.Printf("get time %s [data: %d bytes]", dt, len(resp))
+		}
 	}
 
 	return
@@ -75,7 +86,11 @@ func (c *Async) Set(key string, data []byte) {
 	c.Underlying.Set(key, data)
 
 	if c.Time != nil {
-		go c.Time("set", time.Since(t0))
+		dt := time.Since(t0)
+		go c.Time("set", dt)
+		if c.Log != nil {
+			go c.Log.Printf("set time %s [data: %d bytes]", dt, len(data))
+		}
 	}
 }
 
@@ -95,6 +110,10 @@ func (c *Async) Delete(key string) {
 	c.Underlying.Delete(key)
 
 	if c.Time != nil {
-		go c.Time("delete", time.Since(t0))
+		dt := time.Since(t0)
+		go c.Time("delete", dt)
+		if c.Log != nil {
+			go c.Log.Printf("delete time %s", dt)
+		}
 	}
 }
