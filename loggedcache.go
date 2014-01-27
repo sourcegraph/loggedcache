@@ -49,7 +49,9 @@ func (c *Async) Get(key string) (resp []byte, ok bool) {
 	resp, ok = c.Underlying.Get(key)
 
 	if ok {
-		go c.Hit()
+		if c.Hit != nil {
+			go c.Hit()
+		}
 		if c.Log != nil {
 			go c.Log.Printf("get hit %q", key)
 		}
